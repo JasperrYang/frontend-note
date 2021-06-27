@@ -153,6 +153,8 @@ promise
 
 - 只要有一个 `Promise` 实例为 `rejected`，那执行结果就会变为 `rejected`，此时第一个被 `reject` 的实例的返回值，会传递给回调函数
 
+- 允许按照异步代码的调用顺序得到异步代码的执行结果
+
 ```js
 let p1 = setTimeout(function timer1() {
   console.log("p1");

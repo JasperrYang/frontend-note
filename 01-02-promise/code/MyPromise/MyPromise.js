@@ -13,31 +13,122 @@ const REJECTED = "rejected";
 
 class MyPromise {
   constructor(executor) {
-    executor(this.resolve, this.reject);
+    try {
+      executor(this.resolve, this.reject);
+    } catch (error) {
+      this.reject(error);
+    }
   }
 
   status = PENDING;
   value = undefined;
   reason = undefined;
+  successCallback = [];
+  failedCallback = [];
 
   resolve = (value) => {
     if (this.status !== PENDING) return;
     this.status = FULFILLED;
     this.value = value;
+    // this.successCallback && this.successCallback(this.value);
+    while (this.successCallback.length)
+      this.successCallback.shift()(this.value);
   };
 
   reject = (reason) => {
     if (this.status !== PENDING) return;
     this.status = REJECTED;
     this.reason = reason;
+    // this.failedCallback && this.failedCallback(this.reason);
+    while (this.failedCallback.length) this.failedCallback.shift()(this.reason);
   };
 
   then(successCallback, failedCallback) {
-    if (this.status === FULFILLED) {
-      successCallback(this.value);
-    } else if (this.status === REJECTED) {
-      failedCallback(this.reason);
+    // 参数可选
+    successCallback = successCallback ? successCallback : (value) => value;
+    // 参数可选
+    failedCallback = failedCallback
+      ? failedCallback
+      : (reason) => {
+          throw reason;
+        };
+    const promise = new MyPromise((resolve, reject) => {
+      try {
+        if (this.status === FULFILLED) {
+          setTimeout(() => {
+            let result = successCallback(this.value);
+            resolvePromise(promise, result, resolve, reject);
+          }, 0);
+        } else if (this.status === REJECTED) {
+          failedCallback(this.reason);
+        } else {
+          // 等待状态：异步函数
+          this.successCallback.push(successCallback);
+          this.failedCallback.push(failedCallback);
+        }
+      } catch (error) {
+        reject(error);
+      }
+    });
+    return promise;
+  }
+
+  static all(array) {
+    let result = [];
+    let count = 0;
+    function addDate(index, data) {
+      result[index] = data;
+      count++;
+      if (count === array.length) {
+        resolve(result);
+      }
     }
+
+    array.forEach((element, index) => {
+      if (element instanceof MyPromise) {
+        element.then(
+          (value) => addDate(index, value),
+          (reason) => reject(reason)
+        );
+      } else {
+        addDate(index, element);
+      }
+    });
+  }
+
+  static resolve(value) {
+    if (value instanceof MyPromise) return value;
+    return new MyPromise((resolve) => resolve(value));
+  }
+
+  finally(callback) {
+    return this.then(
+      (value) => {
+        return MyPromise.resolve(callback()).then(() => value);
+      },
+      (reason) => {
+        return MyPromise.resolve(callback()).then(() => {
+          throw reason;
+        });
+      }
+    );
+  }
+
+  catch(failCallback) {
+    return this.then(undefined, failCallback);
+  }
+}
+
+function resolvePromise(promise, result, resolve, reject) {
+  if (promise === result) {
+    return reject(
+      new TypeError("Chaining cycle detected for promise #<Promise>")
+    );
+  }
+  if (result instanceof MyPromise) {
+    result.then(resolve, reject);
+  } else {
+    resolve(result);
   }
 }
 
