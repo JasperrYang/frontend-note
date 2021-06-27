@@ -1,0 +1,20 @@
+{
+  "name": "local",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitee.com:Yang3381/lcoal.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "folktale": "^2.3.2",
+    "lodash": "^4.17.21"
+  }
+}
