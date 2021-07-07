@@ -91,3 +91,247 @@ function passAny(value: any) {
   value.substr(1)
 }
 ```
+
+## TypeScript
+
+> JavaScript 的超集
+
+### 快速上手
+
+`yarn init --yes` 初始化模块
+
+`yarn add typescript --dev` 安装扩展模块
+
+新建 `helloTypeScript.ts` 文件
+
+```js
+const hello = (name: string) => {
+  console.log(`Hello ${name}`);
+};
+hello("TypeScript");
+```
+
+通过 `yarn tsc ./helloTypeScript.ts` 命令编译运行
+
+### 配置文件
+
+> 如果一个目录下存在一个 `tsconfig.json` 文件，那么它意味着这个目录是 `TypeScript` 项目的根目录。 `tsconfig.json` 文件中指定了用来编译这个项目的根文件和编译选项。
+
+创建 `tsconfig.json` 文件：`yarn tsc --init`
+
+| 配置             | 含义                                                                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------ |
+| target           | 指定 ECMAScript 目标版本                                                                         |
+| module           | 指定生成哪个模块系统代码                                                                         |
+| lib              | 编译过程中需要引入的库文件的列表                                                                 |
+| outDir           | 重定向输出目录                                                                                   |
+| rootDir          | 仅用来控制输出的目录结构                                                                         |
+| strict           | 启用所有严格类型检查选项。                                                                       |
+| strictNullChecks | 在严格的 null 检查模式下， null 和 undefined 值不包含在任何类型里，只允许用它们自己和 any 来赋值 |
+
+### 类型
+
+#### 作用域问题
+
+```ts
+// (function(){
+//   const a: number = 123;
+// })()
+
+const a: number = 123;
+// 以模块的方式工作
+export {};
+```
+
+#### 普通类型
+
+```ts
+/**
+ * 原始类型（严格模式）
+ */
+
+const a: string = "string";
+
+const b: number = 100; // NaN Infinity
+
+const c: boolean = false;
+
+// const d: boolean = null;
+
+const e: void = undefined;
+
+const f: null = null;
+
+const g: undefined = undefined;
+// 需要版本为 ES2015
+const h: symbol = Symbol();
+```
+
+#### Object 类型
+
+> 可以是除普通类型外的数组、对象、函数类型
+
+```ts
+const foo: object = {};
+// const foo: object = []
+// const foo: object = function(){}
+const obj: { foo: number; bar: string } = { foo: 123, bar: "aa" };
+```
+
+#### 数组类型
+
+```ts
+const arr1: Array<number> = [1, 3, 4];
+const arr2: number[] = [1, 3, 4, 5, 6];
+```
+
+#### 元祖类型
+
+> 表示一个已知元素数量和类型的数组，各元素的类型不必相同
+
+```ts
+/**
+ * 元组类型
+ */
+const tuple: [number, string] = [123, "ha"];
+```
+
+#### 枚举类型
+
+> 默认情况下，从 `0` 开始为元素编号。 你也可以手动的指定成员的数值
+
+```ts
+// enum Color {
+//   Red,
+//   Green,
+//   Blue,
+// }
+// const color: Color = Color.Green;
+
+const enum Color {
+  Red = 1,
+  Green,
+  Blue,
+}
+const colorName: string = Color[2];
+
+console.log(colorName); // 显示'Green'因为上面代码里它的值是2
+```
+
+建议使用`const`定义枚举类型，因为在编译时会生成键值对对象，而我们实际使用过程中并不需要这种形式
+
+```js
+var Color;
+(function (Color) {
+  Color[(Color["Red"] = 1)] = "Red";
+  Color[(Color["Green"] = 2)] = "Green";
+  Color[(Color["Blue"] = 3)] = "Blue";
+})(Color || (Color = {}));
+var colorName = Color[2];
+console.log(colorName); // 显示'Green'因为上面代码里它的值是2
+```
+
+#### 函数类型
+
+```ts
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+const func: (a: number, b: number) => number = function (
+  a: number,
+  b: number
+): number {
+  return a * b;
+};
+```
+
+#### 任意类型
+
+```ts
+let child: any = "rob";
+
+child = 123;
+
+child = false;
+```
+
+#### 隐式类型推断
+
+> 如果我们没有明确指定变量的类型，那么 ts 将会根据我们的使用情况自动推断变量的类型。如果没有办法推断那默认会是 any 类型
+
+#### 类型断言
+
+> 断言并非类型转换。类型转换是运行时，断言是编译时。
+
+```js
+const nums = [1,3,4,5,6];
+const res = nums.find(num => num > 0)
+// const square = res * res; // 无法确定其类型
+const num1 = res as number;
+const num2 = <number>res; // JSX 下会和标签语法冲突
+```
+
+### 接口
+
+> 在 TypeScript 里，接口的作用就是为这些类型命名和为你的代码或第三方代码定义约束。
+
+```js
+export {}
+interface Post {
+  title: string
+  content: string
+  total: number
+  status?: boolean // 可选
+  readonly summary: string // 只读
+}
+
+const hello: Post = {
+  title: 'TypeScript',
+  content: 'hello',
+  total: 100,
+  status: true,
+  summary: '好书'
+}
+```
+
+### 类
+
+> 增强了 ES6 中的 class，增加了访问修饰符、只读属性等
+
+- public：默认的，全部可见的
+- private：不能在声明它的类的外部访问
+- protected：与 `private` 修饰符的行为很相似，但 `protected` 成员在派生类中仍然可以访问
+
+```js
+export {}
+class person {
+  // 类型属性必须赋值
+  public name: string
+  private age: number
+  protected readonly gender: string
+
+  constructor(name: string, age: number, gender: string) {
+    this.name = name
+    this.age = age
+    this.gender = gender
+  }
+
+  sayHi(msg: string) {
+    console.log(`I am ${this.name}, ${msg}`);
+  }
+}
+```
+
+### 泛型
+
+### 类型声明
+
+> `declare`
+
+```js
+import { cameCase } from "lodash";
+
+declare function cameCase(input: string): string;
+const res = cameCase("hello");
+```
