@@ -1,0 +1,11 @@
+{
+  "name": "mock-cli",
+  "version": "1.0.0",
+  "bin": "cli.js",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "ejs": "^3.1.6",
+    "inquirer": "^8.1.2"
+  }
+}
