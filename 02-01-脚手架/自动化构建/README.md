@@ -42,10 +42,6 @@ npm 脚本有 `pre` 和 `post `两个钩子。举例来说，build 脚本命令�
 npm run prebuild && npm run build && npm run postbuild
 ```
 
-- build
-- serve
-- start
-
 ### npm package
 
 - npm-run-all：同时启动运行多个命令
