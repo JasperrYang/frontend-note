@@ -224,4 +224,208 @@ module.exports = (grunt) => {
 
 ## Gulp
 
+### 基本使用
+
+安装 `gulp`
+
+```js
+yarn add gulp --dev
+```
+
+创建 `gulpfile.js` 文件
+
+**在最新的 gulp 中约定每个任务都是异步任务，因此我们需要标记任务完成通过 done 参数**
+
+```js
+exports.foo = (done) => {
+  console.log("foo task working...");
+  done();
+};
+// 默认任务
+exports.default = (done) => {
+  console.log("this is default task");
+  done();
+};
+// gulp 4.0 以前通过注册一个任务,不推荐
+const gulp = require("gulp");
+gulp.task("old", (done) => {
+  console.log("old gulp task..");
+  done();
+});
+```
+
+执行任务
+
+```
+yarn gulp foo
+```
+
+### 组合任务
+
+我们可以根据具体场景选择任务是并行执行（paralle）还是串行执行（series）。
+
+- 部署需要先执行编译任务，在执行部署任务，那么应该是串行执行
+- 编译时，less/sass 和 js 的编译并没有先后依赖关系，那么可以并行执行，提高效率
+
+```js
+const { series, parallel } = require("gulp");
+
+const task1 = (done) => {
+  setTimeout(() => {
+    console.log("task1 working~");
+    done();
+  }, 1000);
+};
+
+const task2 = (done) => {
+  setTimeout(() => {
+    console.log("task2 working~");
+    done();
+  }, 1000);
+};
+const task3 = (done) => {
+  setTimeout(() => {
+    console.log("task3 working~");
+    done();
+  }, 1000);
+};
+
+exports.foo = series(task1, task2, task3); //串行依次执行
+
+exports.bar = parallel(task1, task2, task3); //并行执行
+```
+
+### 异步任务
+
+回调函数
+
+```js
+exports.callback = (done) => {
+  console.log("callback task~");
+  done();
+};
+
+//如果多个任务执行，后面不会再执行
+exports.callback_error = (done) => {
+  console.log("callback_error task~");
+  done(new Error("task Failed"));
+};
+```
+
+promise
+
+```js
+exports.promise = () => {
+  console.log("promise task~");
+  return Promise.resolve("ok"); //要返回一个promise对象
+};
+
+exports.promise_error = () => {
+  console.log("promise_error task~");
+  return Promise.reject(new Error("task Failed")); //要返回一个promise对象
+};
+```
+
+async/await
+
+```js
+const timeout = (time) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, time);
+  });
+};
+exports.async = async () => {
+  await timeout(1000);
+  console.log("async task~");
+};
+```
+
+### Gulp 构建过程核心工作原理
+
+- **基于流的构建系统**
+
+```js
+const fs = require("fs");
+const { Transform } = require("stream");
+
+exports.default = () => {
+  //文件读取流
+  const read = fs.createReadStream("normalize.css");
+
+  //文件写入流
+  const write = fs.createWriteStream("normalize.min.css");
+
+  //文件转换流
+  const transform = new Transform({
+    //
+    transform: (chunk, encoding, callback) => {
+      //核心转换过程
+      //核心转换过程实现
+      //chunk => 读取流中读到的内容（Buffer）toString转化程字符串
+      const input = chunk.toString();
+      const output = input.replace(/\s+/g, "").replace(/\/\*.+?\*\//g, "");
+      callback(null, output); //错误优先，没有错误传null
+    },
+  });
+
+  //把读取出来的文件流导入写入文件流
+  read.pipe(transform).pipe(write);
+
+  return read;
+};
+```
+
+### Gulp 文件操作 API
+
+> 转换流一般都是通过插件提供 `src().pipe(转换流).pipe(dest(目标目录))`
+
+```js
+const { src, dest } = require("gulp");
+const cleanCss = require("gulp-clean-css");
+const rename = require("gulp-rename");
+
+exports.default = () => {
+  return src("src/*.css") //创建文件读取流
+    .pipe(cleanCss())
+    .pipe(rename({ extname: ".min.css" })) //重命名扩展名
+    .pipe(dest("dist")); //导出到dest写入流中  参数写入目标目录
+};
+```
+
 ## FIS
+
+### 基本使用
+
+安装
+
+```js
+yarn add fis3 --dev
+```
+
+添加 fis 配置文件 `fis-conf.js`
+
+```js
+//资源定位
+fis.match("*.{js,scss,png}", {
+  release: "/assets/$0", //当前文件原始目录结构
+});
+//编译压缩
+//yarn global add fis-parser-node-sass
+fis.match("**/*.scss", {
+  rExt: ".css",
+  parser: fis.plugin("node-sass"),
+  optimizer: fis.plugin("clean-css"),
+});
+
+//yarn global add fis-parser-babel-6.x
+fis.match("**/*.js", {
+  parser: fis.plugin("babel-6.x"),
+  optimizer: fis.plugin("uglify-js"),
+});
+```
+
+执行，fis3 inspect 查看转换文件
+
+```js
+fis3 release -d output
+```
