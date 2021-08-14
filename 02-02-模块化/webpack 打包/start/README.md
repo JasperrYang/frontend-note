@@ -10,7 +10,7 @@ webpack 就是一个前端资源打包工具，它根据模块的依赖关系进
 yarn add webpack webpack-cli --dev
 ```
 
-[文件目录]()，创建 `webpack.config.js` 配置文件（在 webpack v4 中，可以无须任何配置，然而大多数项目会需要很复杂的设置）。
+[文件目录](https://github.com/29984608/frontend-study-note/tree/main/02-02-%E6%A8%A1%E5%9D%97%E5%8C%96/webpack%20%E6%89%93%E5%8C%85/start)，创建 `webpack.config.js` 配置文件（在 webpack v4 中，可以无须任何配置，然而大多数项目会需要很复杂的设置）。
 
 ```js
 const path = require("path");
