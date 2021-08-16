@@ -27,3 +27,7 @@
 ### [webpack-起步](https://github.com/29984608/frontend-study-note/blob/main/02-02-%E6%A8%A1%E5%9D%97%E5%8C%96/webpack%20%E6%89%93%E5%8C%85/start/README.md)
 
 ### [webpack-优化](https://github.com/29984608/frontend-study-note/blob/main/02-02-%E6%A8%A1%E5%9D%97%E5%8C%96/webpack%20%E6%89%93%E5%8C%85/enhance/README.md)
+
+### [Rollup](https://github.com/29984608/frontend-study-note/blob/main/02-02-%E6%A8%A1%E5%9D%97%E5%8C%96/rollup/README.md)
+
+### [Parcel](https://github.com/29984608/frontend-study-note/blob/main/02-02-%E6%A8%A1%E5%9D%97%E5%8C%96/parcel/README.md)
