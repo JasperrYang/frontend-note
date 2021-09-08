@@ -2,9 +2,9 @@
   <div id="app">
     <div id="nav">
       <router-view></router-view>
-      <!-- <router-link to="/">Index</router-link> |
+      <router-link to="/">Index</router-link> |
       <router-link to="/blog">Blog</router-link> |
-      <router-link to="/photo">Photo</router-link> -->
+      <router-link to="/photo">Photo</router-link>
     </div>
   </div>
 </template>
