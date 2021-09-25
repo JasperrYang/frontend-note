@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>观察者模式</title>
+</head>
+<body>
+
+</body>
+</html>
+<script type="text/javascript">
+  class Subscriber {
+    constructor () {
+      this.subs = []
+    }
+
+    add(sub) {
+      this.subs.push(sub)
+    }
+
+    notify() {
+      this.subs.forEach(handler => { handler.update() })
+    }
+  }
+
+  class Observer {
+    constructor (name) {
+      this.name = name;
+    }
+
+    update() {
+      console.log('接到通知', this.name);
+    }
+  }
+
+  const subscriber = new Subscriber();
+  const jack = new Observer('jack');
+  const tom = new Observer('tom');
+
+  subscriber.add(jack)
+  subscriber.add(tom)
+
+  subscriber.notify()
+</script>

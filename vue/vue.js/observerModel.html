@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>发布订阅模式</title>
+</head>
+<body>
+
+</body>
+</html>
+<script type="text/javascript">
+  class EventController {
+    constructor() {
+      this.subs = {}
+    }
+
+    subscribe(key, fn) {
+      this.subs[key] = this.subs[key] || []
+      this.subs[key].push(fn)
+    }
+
+    publish(key, ...args) {
+      if (this.subs[key]) {
+        this.subs[key].forEach(handler => { handler(...args) });
+      }
+    }
+  }
+
+  const event = new EventController()
+  event.subscribe('onWork', time => { console.log('上班了', time) });
+  event.subscribe('offWork', time => { console.log('下班了', time); });
+  event.subscribe('onLaunch', time => { console.log('吃饭了', time); });
+
+  event.publish('offWork', '18:00:00');
+  event.publish('onLaunch', '20:00:00');
+</script>
