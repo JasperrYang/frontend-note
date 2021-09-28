@@ -159,14 +159,250 @@
 
 ## 实现过程
 
+![实现过程](https://upload-images.jianshu.io/upload_images/6010417-09dba3a94373a54a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 ### Vue
+
+- 接收初始化的参数，注入到 Vue 实列 $options 属性中
+- 把 data 中的属性注入到 Vue 实列 $data 属性中，并生成 getter/setter
+- 调用 observer 监听 data 中属性的变化
+- 调用 compiler 解析指令/插值表达式
+
+```js
+class Vue {
+  constructor (options) {
+    // 1. 通过属性保存选项的数据
+    this.$options = options || {};
+    this.$data = options.data || {};
+    this.$el = typeof options.el === 'string' ? document.querySelector(options.el) : options.el;
+    // 2. 把data中的成员转换成getter和setter，注入到vue实例中
+    this._proxyData(this.$data);
+    // 3. 调用observer对象，监听数据的变化
+    new Observer(this.$data);
+    // 4. 调用compiler对象，解析指令和差值表达式
+    new Compiler(this);
+  }
+
+  _proxyData(data) {
+    Object.keys(data).forEach(key => {
+      // 把data的属性注入到vue实例中
+      Object.defineProperty(this, key, {
+        configurable: true,
+        enumerable: true,
+        get () {
+          return data[key];
+        },
+        set (newValue) {
+          if (newValue === data[key]) {
+            return;
+          }
+          data[key] = newValue;
+        }
+      })
+    })
+  }
+}
+```
 
 ### Observer
 
+- 把 data 中的属性转换为响应式数据
+- 数据变化发送通知
+
+```js
+class Observer {
+  constructor(data) {
+    this.walk(data);
+  }
+
+  walk(data) {
+    // 1. 判断data是否是对象
+    if (!data || typeof data !== 'object') {
+      return
+    }
+    // 2. 遍历data对象的所有属性
+    Object.keys(data).forEach(key => {
+      this.defineReactive(data, key, data[key])
+    })
+  }
+  defineReactive(data, key, val) {
+    // 如果val是对象，把val内部的属性转换成响应式数据
+    this.walk(val)
+    const that = this;
+    // 收集依赖，并发送通知
+    const dep = new Dep();
+    Object.defineProperty(data, key, {
+      configurable: true,
+      enumerable: true,
+      get() {
+        // 收集依赖
+        Dep.target && dep.addSubs(Dep.target);
+        return val;
+      },
+      set(newVal) {
+        if (newVal === val) { return; }
+        val = newVal;
+        // 如果newValue是对象，把newValue内部的属性转换成响应式数据
+        that.walk(newVal);
+        // 发送通知
+        dep.notify();
+      }
+    })
+  }
+}
+```
+
 ### Compiler
+
+- 编译模板，解析指令
+- 页面渲染，当数据变化后重新渲染视图
+
+```js
+class Compiler {
+  constructor(vm) {
+    this.el = vm.$el;
+    this.vm = vm;
+    this.compile(this.el);
+  }
+
+  // 编译模板，处理文本节点和元祖节点
+  compile (el) {
+    Array.from(el.childNodes).forEach(node => {
+      // 处理文本节点
+      if (this.isTextNode(node)) {
+        this.compileText(node)
+      } else if (this.isElementNode(node)) {
+        // 处理元素节点
+        this.compileElement(node)
+      }
+
+      // 判断node节点，是否有子节点，如果有子节点，要递归调用compile
+      if (node.childNodes && node.childNodes.length) {
+        this.compile(node)
+      }
+    })
+  }
+
+  // 编译文本节点，处理差值表达式
+  compileText (node) {
+    const reg = /\{\{(.+?)\}\}/
+    if (reg.test(node.textContent)) {
+      const key = RegExp.$1.trim();
+      node.textContent = node.textContent.replace(reg, this.vm[key]);
+
+      // 创建watcher对象，当数据改变更新视图
+      new Watcher(this.vm, key, (newValue) => { node.textContent = newValue });
+    }
+  }
+
+  // 编译元素节点，处理指令
+  compileElement (node) {
+    Array.from(node.attributes).forEach(attr => {
+      if (this.isDirective(attr.name)) {}
+        const attrName = attr.name.substr(2);
+        const key = attr.value;
+        const updateFn = this[attrName + 'Updater']
+        updateFn && updateFn.call(this, node, this.vm[key], key)
+    })
+  }
+
+  // v-text
+  textUpdater (node, value, key) {
+    node.textContent = value;
+
+    // 创建watcher对象，当数据改变更新视图
+    new Watcher(this.vm, key, (newValue) => { node.textContent = newValue });
+  }
+  // v-model
+  modelUpdater (node, value, key) {
+    node.value = value;
+
+    // 创建watcher对象，当数据改变更新视图
+    new Watcher(this.vm, key, (newValue) => { node.value = newValue });
+
+    // 双向绑定
+    node.addEventListener('input', () => { this.vm[key] = node.value });
+  }
+
+  // 判断元素属性是否是指令
+  isDirective (attrName) {
+    return attrName.startsWith('v-');
+  }
+
+  // 判断节点是否是文本节点
+  isTextNode (node) {
+    return node.nodeType === 3;
+  }
+
+  // 判断节点是否是元素节点
+  isElementNode (node) {
+    return node.nodeType === 1;
+  }
+}
+```
 
 ### Dep
 
+- 发布者
+- 在 getter 中添加观察者，在 setter 中发送通知
+
+```js
+class Dep {
+  constructor() {
+    // 存储所有的观察者
+    this.subs = [];
+  }
+  // 添加观察者
+  addSubs(sub) {
+    if (sub && sub.update) {
+      this.subs.push(sub);
+    }
+  }
+  // 发送通知
+  notify() {
+    this.subs.forEach(sub => { sub.update() });
+  }
+}
+```
+
 ### Watcher
 
+- 实例化时添加到 dep
+- 数据发生变化时，dep 通知所有 watcher 实列更新视图
+
+```js
+class Watcher {
+  constructor(vm, key, cb) {
+    // vue 实列
+    this.vm = vm;
+    // data中的属性名称
+    this.key = key;
+    // 回调函数负责更新视图
+    this.cb = cb;
+    // 把watcher对象记录到Dep类的静态属性target
+    Dep.target = this;
+    // 触发get方法，在get方法中会调用addSub
+    this.oldValue = vm[key];
+    // 置空，防止影响其他属性
+    Dep.target = null;
+  }
+
+  // 当数据发生变化的时候更新视图
+  update() {
+    const newValue = this.vm[this.key]
+    if (this.oldValue === newValue) {
+      return
+    }
+    this.cb(newValue);
+  }
+}
+```
+
 ### 双向绑定
+
+- 监听文本框 input 事件，更新节点 value
+
+```js
+  // 双向绑定
+  node.addEventListener('input', () => { this.vm[key] = node.value });
+```
