@@ -31,3 +31,11 @@
 ### [Rollup](https://github.com/29984608/frontend-study-note/blob/main/02-02-%E6%A8%A1%E5%9D%97%E5%8C%96/rollup/README.md)
 
 ### [Parcel](https://github.com/29984608/frontend-study-note/blob/main/02-02-%E6%A8%A1%E5%9D%97%E5%8C%96/parcel/README.md)
+
+## Vue.js 框架源码与进阶
+
+### [Vue Router 实现](https://github.com/29984608/frontend-study-note/blob/main/vue/router/README.md)
+
+### [响应式实现](https://github.com/29984608/frontend-study-note/blob/main/vue/vue.js/README.md)
+
+### [虚拟 DOM 和 Diff 算法](https://github.com/29984608/frontend-study-note/blob/main/vue/vritualDom/README.md)
