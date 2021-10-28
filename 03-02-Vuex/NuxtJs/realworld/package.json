@@ -1,0 +1,16 @@
+{
+  "name": "realworld",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nuxt"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "axios": "^0.24.0",
+    "nuxt": "^2.15.8"
+  }
+}
