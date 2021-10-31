@@ -41,16 +41,20 @@ function formatRouters (resolve) {
         }
       ]
     }
-  ];
+  ]
 }
 
 module.exports = {
   router: {
     linkActiveClass: 'active',
-    extendRoutes(routes, resolve) {
+    extendRoutes (routes, resolve) {
       routes.splice(0)
-      const route = formatRouters(resolve);
+      const route = formatRouters(resolve)
       routes.push(...route)
     }
-  }
+  },
+  plugins: [
+    '@/plugins/request.js',
+    '@/plugins/dayjs.js'
+  ]
 }

@@ -1,0 +1,43 @@
+{
+  "singleQuote": true,
+  "printWidth": 120,
+  "overrides": [
+    {
+      "files": [
+        "*.json"
+      ],
+      "options": {
+        "parser": "json-stringify"
+      }
+    },
+    {
+      "files": [
+        "*.wxss",
+        "*.css"
+      ],
+      "options": {
+        "parser": "css"
+      }
+    },
+    {
+      "files": [
+        "*.wxml",
+        "*.html"
+      ],
+      "options": {
+        "singleQuote": false,
+        "htmlWhitespaceSensitivity": "css",
+        "parser": "html",
+        "printWidth": 80
+      }
+    },
+    {
+      "files": [
+        "*.md"
+      ],
+      "options": {
+        "parser": "markdown"
+      }
+    }
+  ]
+}

@@ -17,7 +17,9 @@
               <li
                 v-for="(message, index) in messages"
                 :key="index"
-              >{{ field }} {{ message }}</li>
+              >
+                {{ field }} {{ message }}
+              </li>
             </template>
           </ul>
 
@@ -29,7 +31,7 @@
                 type="text"
                 placeholder="Your Name"
                 required
-              />
+              >
             </fieldset>
             <fieldset class="form-group">
               <input
@@ -38,7 +40,7 @@
                 type="text"
                 placeholder="Email"
                 required
-              />
+              >
             </fieldset>
             <fieldset class="form-group">
               <input
@@ -48,7 +50,7 @@
                 placeholder="Password"
                 required
                 minlength="6"
-              />
+              >
             </fieldset>
             <button class="btn btn-lg btn-primary pull-xs-right">{{ isLogin ? 'Sign in' : 'Sign up' }}</button>
           </form>
@@ -59,40 +61,44 @@
 </template>
 
 <script>
-import { login, register } from '@/engine/user';
+import { login, register } from '@/engine/user'
+// 仅在客户端加载 js-cookie 包
+const Cookie = process.client ? require('js-cookie') : undefined
 
 export default {
   name: 'LoginIndex',
-  computed: {
-    isLogin() {
-      return this.$route.name === 'login';
-    },
-  },
-  data() {
+  middleware: 'notAuthenticated',
+  data () {
     return {
       user: {
         username: '',
         email: '',
-        password: '',
+        password: ''
       },
-      errors: {}, // 错误信息
-    };
+      errors: {} // 错误信息
+    }
+  },
+  computed: {
+    isLogin () {
+      return this.$route.name === 'login'
+    }
   },
   methods: {
-    async onSubmit() {
+    async onSubmit () {
       try {
         const { data } = this.isLogin
           ? await login({ user: this.user })
-          : await register({ user: this.user });
-        // 跳转到首页
-        this.$router.push('/');
+          : await register({ user: this.user })
+        this.$store.commit('setUser', data.user)
+        Cookie.set('user', data.user)
+        this.$router.push('/')
       } catch (err) {
-        this.errors = err.response.data.errors;
-        console.log(err);
+        this.errors = err.response.data.errors
+        console.log(err)
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style></style>
