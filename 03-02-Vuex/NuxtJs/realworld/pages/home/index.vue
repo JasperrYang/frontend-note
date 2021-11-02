@@ -179,7 +179,7 @@
 
 <script>
 import { Article } from '@/engine/article'
-import { getTags } from '@/engine/tag'
+import { Tag } from '@/engine/tag'
 import { mapState } from 'vuex'
 
 export default {
@@ -200,7 +200,7 @@ export default {
         offset: (page - 1) * limit,
         tag
       }),
-      getTags()
+      Tag.getTags()
     ])
 
     const { articles, articlesCount } = articleRes.data

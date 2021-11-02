@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { login, register } from '@/engine/user'
+import { User } from '@/engine/user'
 // 仅在客户端加载 js-cookie 包
 const Cookie = process.client ? require('js-cookie') : undefined
 
@@ -87,8 +87,8 @@ export default {
     async onSubmit () {
       try {
         const { data } = this.isLogin
-          ? await login({ user: this.user })
-          : await register({ user: this.user })
+          ? await User.login({ user: this.user })
+          : await User.register({ user: this.user })
         this.$store.commit('setUser', data.user)
         Cookie.set('user', data.user)
         this.$router.push('/')
