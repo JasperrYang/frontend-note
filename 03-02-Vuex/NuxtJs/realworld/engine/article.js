@@ -3,12 +3,12 @@ import { request } from '@/plugins/request'
 export class Article {
   // 获取公共文章列表
   static getArticles = (params) => {
-    return request.get('/api/articles', params)
+    return request.get('/api/articles', { params })
   };
 
   // 获取公共文章列表
   static getYourFeedArticles = (params) => {
-    return request.get('/api/articles/feed', params)
+    return request.get('/api/articles/feed', { params })
   };
 
   // 添加点赞
