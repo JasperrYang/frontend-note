@@ -48,16 +48,24 @@
       </button>
     </template>
     <template v-else>
-      <button
+      <nuxt-link
         class="btn btn-sm btn-outline-secondary"
+
+        :to="{
+          name: 'editor',
+          params: {
+            slug: article.slug
+          }
+        }"
       >
         <i class="ion-edit" />
         &nbsp;
         Edit Article
-      </button>
-    &nbsp;&nbsp;
+      </nuxt-link>
+      &nbsp;&nbsp;
       <button
         class="btn btn-outline-danger btn-sm"
+        @click="onDelete"
       >
         <i class="ion-trash-a" />
         &nbsp;
@@ -69,6 +77,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { Article } from '@/engine/article'
 export default {
   name: 'ArticleMeta',
   props: {
@@ -79,6 +88,12 @@ export default {
   },
   computed: {
     ...mapState(['user'])
+  },
+  methods: {
+    async onDelete () {
+      await Article.delete(this.article.slug)
+      this.$router.go(-1)
+    }
   }
 }
 </script>

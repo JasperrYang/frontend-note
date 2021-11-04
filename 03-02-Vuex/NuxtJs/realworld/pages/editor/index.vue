@@ -59,13 +59,20 @@ import { Article } from '@/engine/article'
 export default {
   name: 'EditorIndex',
   middleware: 'authenticated',
-  data () {
-    return {
-      article: {
-        title: '',
-        description: '',
-        body: '',
-        tagList: []
+  async asyncData ({ params }) {
+    if (params.slug) {
+      const { data } = await Article.getArticle(params.slug)
+      return {
+        article: data.article
+      }
+    } else {
+      return {
+        article: {
+          title: '',
+          description: '',
+          body: '',
+          tagList: []
+        }
       }
     }
   },
@@ -79,11 +86,22 @@ export default {
       const params = {
         article: {
           ...this.article,
-          tagList: this.article.tagList.split(',')
+          tagList: typeof (this.article.tagList) === 'string' ? this.article.tagList.split(',') : this.article.tagList
         }
       }
-      const { data } = await Article.create(params)
-      this.$router.push(`/article/${data.article.slug}`)
+      try {
+        let result = {}
+        if (this.article.slug) {
+          result = await Article.update(this.article.slug, params)
+        } else {
+          result = await Article.create(params)
+        }
+        const data = result.data.article
+        this.$router.push(`/article/${data.slug}`)
+      } catch (e) {
+        console.log(e)
+        alert(e)
+      }
     }
   }
 }

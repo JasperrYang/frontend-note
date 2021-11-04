@@ -35,4 +35,14 @@ export class Article {
   static create = (params) => {
     return request.post('/api/articles', params)
   }
+
+  // 删除文章
+  static delete = (slug) => {
+    return request.delete(`/api/articles/${slug}`)
+  }
+
+  // 更新文章
+  static update = (slug, params) => {
+    return request.put(`/api/articles/${slug}`, params)
+  }
 }

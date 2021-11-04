@@ -30,7 +30,7 @@ function formatRouters (resolve) {
           component: resolve(__dirname, 'pages/settings/')
         },
         {
-          path: '/editor',
+          path: '/editor/:slug?',
           name: 'editor',
           component: resolve(__dirname, 'pages/editor/')
         },

@@ -54,6 +54,10 @@
               </button>
             </fieldset>
           </form>
+          <hr>
+          <button class="btn btn-outline-danger" @click="logout()">
+            Or click here to logout.
+          </button>
         </div>
       </div>
     </div>
@@ -88,6 +92,11 @@ export default {
       this.$store.commit('setUser', data.user)
       Cookie.set('user', data.user)
       this.$router.push(`/profile/${data.user.username}`)
+    },
+    async logout () {
+      this.$store.commit('setUser', {})
+      Cookie.remove('user')
+      this.$router.push('/')
     }
   }
 }
