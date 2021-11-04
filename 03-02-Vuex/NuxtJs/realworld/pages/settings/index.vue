@@ -8,21 +8,50 @@
           <form>
             <fieldset>
               <fieldset class="form-group">
-                <input class="form-control" type="text" placeholder="URL of profile picture">
+                <input
+                  v-model="member.image"
+                  class="form-control"
+                  type="text"
+                  placeholder="URL of profile picture"
+                >
               </fieldset>
               <fieldset class="form-group">
-                <input class="form-control form-control-lg" type="text" placeholder="Your Name">
+                <input
+                  v-model="member.username"
+                  class="form-control form-control-lg"
+                  type="text"
+                  placeholder="Your Name"
+                >
               </fieldset>
               <fieldset class="form-group">
-                <textarea class="form-control form-control-lg" rows="8" placeholder="Short bio about you" />
+                <textarea
+                  v-model="member.bio"
+                  class="form-control form-control-lg"
+                  rows="8"
+                  placeholder="Short bio about you"
+                />
               </fieldset>
               <fieldset class="form-group">
-                <input class="form-control form-control-lg" type="text" placeholder="Email">
+                <input
+                  v-model="member.email"
+                  class="form-control form-control-lg"
+                  type="text"
+                  placeholder="Email"
+                >
               </fieldset>
               <fieldset class="form-group">
-                <input class="form-control form-control-lg" type="password" placeholder="Password">
+                <input
+                  class="form-control form-control-lg"
+                  type="password"
+                  placeholder="Password"
+                >
               </fieldset>
-              <button class="btn btn-lg btn-primary pull-xs-right">Update Settings</button>
+              <button
+                class="btn btn-lg btn-primary pull-xs-right"
+                @click.prevent="onUpdate()"
+              >
+                Update Settings
+              </button>
             </fieldset>
           </form>
         </div>
@@ -32,9 +61,35 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import { User } from '@/engine/user'
+const Cookie = process.client ? require('js-cookie') : undefined
 export default {
   name: 'SettingsIndex',
-  middleware: 'authenticated'
+  middleware: 'authenticated',
+  data () {
+    return {
+      member: {}
+    }
+  },
+  computed: {
+    ...mapState(['user'])
+  },
+  beforeMount () {
+    this.member = Object.assign({}, this.user)
+    delete this.member.token
+  },
+  methods: {
+    async onUpdate () {
+      const params = {
+        user: this.member
+      }
+      const { data } = await User.update(params)
+      this.$store.commit('setUser', data.user)
+      Cookie.set('user', data.user)
+      this.$router.push(`/profile/${data.user.username}`)
+    }
+  }
 }
 </script>
 

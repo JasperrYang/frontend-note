@@ -30,4 +30,9 @@ export class Article {
   static getComments = (slug) => {
     return request.get(`/api/articles/${slug}/comments`)
   };
+
+  // 创建文章
+  static create = (params) => {
+    return request.post('/api/articles', params)
+  }
 }
