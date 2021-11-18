@@ -1,14 +1,22 @@
-const Vue = require('vue')
 const express = require('express')
-const template = require('fs').readFileSync('./index.template.html', 'utf-8');
-
-const serverBundle = require('./dist/vue-ssr-server-bundle.json')
-const clientManifest = require('./dist/vue-ssr-client-manifest.json')
-
-const renderer  = require('vue-server-renderer').createBundleRenderer(serverBundle, { template, clientManifest })
-
+const setupDevServer = require('./build/setup-dev-server')
+const { createBundleRenderer } = require('vue-server-renderer')
 const server = express()
 server.use('/dist', express.static('./dist'))
+
+const isProd = process.env.NODE_ENV === 'production'
+let onReady, renderer
+if (isProd) {
+  const template = require('fs').readFileSync('./index.template.html', 'utf-8');
+  const serverBundle = require('./dist/vue-ssr-server-bundle.json')
+  const clientManifest = require('./dist/vue-ssr-client-manifest.json')
+  renderer  = createBundleRenderer(serverBundle, { template, clientManifest })
+} else {
+  onReady = setupDevServer(server, (serverBundle, template, clientManifest) => {
+    renderer  = createBundleRenderer(serverBundle, { template, clientManifest })
+  })
+}
+
 
 const context = {
   title: 'vue ssr',
@@ -19,14 +27,18 @@ const context = {
   `,
 };
 
-server.get('/', (req, res) => {
-  renderer.renderToString(context, (err, html) => {
-    if (err) {
-      res.status(500).end('Internal Server Error')
-      return
+const render = async (req, res) => {
+  try {
+    if (!isProd) {
+      await onReady
     }
+    const html = await renderer.renderToString(context)
     res.end(html)
-  })
-})
+  } catch (err) {
+    res.status(500).end('Internal Server Error.')
+  }
+}
+
+server.get('/', render)
 
 server.listen(8080)

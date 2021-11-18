@@ -19,7 +19,7 @@ module.exports = {
     },
     extensions: ['.js','.vue','.json']
   },
-  devtool: isProd ? 'source-map' : 'cheap-module-eval-source-map',
+  devtool: 'source-map',
   module: {
     rules: [
       {
