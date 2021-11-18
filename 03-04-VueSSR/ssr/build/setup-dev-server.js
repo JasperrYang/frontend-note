@@ -31,17 +31,13 @@ module.exports = async (server, callback) => {
     update()
   })
   // 监视构建 serverBundle
-  // const serverCompiler =
   const serverCompiler = webpack(serverConfig)
   const serverDevMiddleware = devMiddleware(serverCompiler)
-  console.log(serverDevMiddleware);
-  console.log(serverDevMiddleware.outputFileSystem);
-  console.log(serverDevMiddleware.outputFileSystem.readFileSync(resolve('../dist/vue-ssr-server-bundle.json'), 'utf-8'));
-  // serverCompiler.hooks.done.tap('server', () => {
-  //   // serverBundle = JSON.parse(serverDevMiddleware.outputFileSystem.readFileSync(resolve('../dist/vue-ssr-server-bundle.json'), 'utf-8'))
-  //   // console.log(serverBundle);
-  //   update()
-  // })
+  serverCompiler.hooks.done.tap('server', () => {
+    serverBundle = JSON.parse(serverDevMiddleware.context.outputFileSystem.readFileSync(resolve('../dist/vue-ssr-server-bundle.json'), 'utf-8'))
+    console.log(serverBundle);
+    update()
+  })
   // 监视构建 clientManifest
   // const clientCompiler = webpack(clientConfig)
 
