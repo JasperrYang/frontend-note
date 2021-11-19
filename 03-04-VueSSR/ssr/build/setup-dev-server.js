@@ -11,16 +11,16 @@ const clientConfig = require('./webpack.client.config')
 const resolve = file => path.resolve(__dirname, file)
 const templatePath = path.resolve(__dirname, '../index.template.html')
 
-module.exports = async (server, callback) => {
+module.exports = (server, callback) => {
   let ready, template, serverBundle, clientManifest
 
   const onReady = new Promise(r => ready = r)
 
   const update = () => {
-    // if (template && serverBundle && clientManifest) {
-      // ready()
-      // callback(serverBundle, template, clientManifest)
-    // }
+    if (template && serverBundle && clientManifest) {
+      ready()
+      callback(serverBundle, template, clientManifest)
+    }
   }
 
   // 监视构建 template
@@ -35,11 +35,20 @@ module.exports = async (server, callback) => {
   const serverDevMiddleware = devMiddleware(serverCompiler)
   serverCompiler.hooks.done.tap('server', () => {
     serverBundle = JSON.parse(serverDevMiddleware.context.outputFileSystem.readFileSync(resolve('../dist/vue-ssr-server-bundle.json'), 'utf-8'))
-    console.log(serverBundle);
     update()
   })
   // 监视构建 clientManifest
-  // const clientCompiler = webpack(clientConfig)
+  const clientCompiler = webpack(clientConfig)
+  const clientDevMiddleware = devMiddleware(clientCompiler, {
+    publicPath: clientConfig.output.publicPath,
+  })
+  clientCompiler.hooks.done.tap('server', () => {
+    clientManifest = JSON.parse(clientDevMiddleware.context.outputFileSystem.readFileSync(resolve('../dist/vue-ssr-client-manifest.json'), 'utf-8'))
+    update()
+  })
+
+  // clientDevMiddleware 挂载到 Express 服务中，提供对其内部内存中数据的访问
+  server.use(clientDevMiddleware)
 
   return onReady
 }
