@@ -2,7 +2,7 @@ const express = require('express')
 const setupDevServer = require('./build/setup-dev-server')
 const { createBundleRenderer } = require('vue-server-renderer')
 const server = express()
-server.use('/dist', express.static('./dist'))
+// server.use('/dist', express.static('./dist'))
 
 const isProd = process.env.NODE_ENV === 'production'
 let onReady, renderer
