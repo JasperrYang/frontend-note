@@ -11,12 +11,13 @@ export default {
   name: 'App',
   data () {
     return {
-      message: '首页'
+      message: '首页1'
     }
   },
   methods: {
     onClick () {
       console.log('Hello World!')
+      console.log(111);
     }
   }
 }
