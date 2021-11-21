@@ -4,6 +4,7 @@
 const { merge } = require('webpack-merge');
 const baseConfig = require('./webpack.base.config.js');
 const VueSSRClientPlugin = require('vue-server-renderer/client-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 module.exports = merge(baseConfig, {
   entry: {
@@ -35,6 +36,7 @@ module.exports = merge(baseConfig, {
     },
   },
   plugins: [
+    new CleanWebpackPlugin(),
     // 此插件在输出目录中生成 `vue-ssr-client-manifest.json`。
     new VueSSRClientPlugin(),
   ],

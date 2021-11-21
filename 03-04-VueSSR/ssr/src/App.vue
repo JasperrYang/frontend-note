@@ -11,7 +11,7 @@ export default {
   name: 'App',
   data () {
     return {
-      message: '首页1'
+      message: '首页'
     }
   },
   methods: {

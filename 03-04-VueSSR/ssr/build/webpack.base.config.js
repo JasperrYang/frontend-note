@@ -1,7 +1,6 @@
 const path = require('path')
 const vueLoaderPlugin = require('vue-loader/lib/plugin')
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
-const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 const resolve = file => path.resolve(__dirname, file)
 
@@ -56,7 +55,6 @@ module.exports = {
     ]
   },
   plugins: [
-    new CleanWebpackPlugin(),
     new vueLoaderPlugin(),
     new FriendlyErrorsWebpackPlugin()
   ]
