@@ -17,28 +17,28 @@ if (isProd) {
   })
 }
 
-
-const context = {
-  title: 'vue ssr',
-  metas: `
-      <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-      <meta name="keyword" content="vue,ssr">
-      <meta name="description" content="vue srr demo">
-  `,
-};
-
 const render = async (req, res) => {
-  try {
+  // try {
     if (!isProd) {
       await onReady
     }
-    const html = await renderer.renderToString(context)
+    console.log(req);
+    const html = await renderer.renderToString({
+      title: 'vue ssr',
+      metas: `
+          <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+          <meta name="keyword" content="vue,ssr">
+          <meta name="description" content="vue srr demo">
+      `,
+      url: req.url,
+    })
+    res.setHeader('Content-Type', 'text/html; charset=utf8')
     res.end(html)
-  } catch (err) {
-    res.status(500).end('Internal Server Error.')
-  }
+  // } catch (err) {
+  //   res.status(500).end('Internal Server Error.')
+  // }
 }
 
-server.get('/', render)
+server.get('*', render)
 
 server.listen(8080)
