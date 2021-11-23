@@ -22,7 +22,6 @@ const render = async (req, res) => {
     if (!isProd) {
       await onReady
     }
-    console.log(req);
     const html = await renderer.renderToString({
       title: 'vue ssr',
       metas: `

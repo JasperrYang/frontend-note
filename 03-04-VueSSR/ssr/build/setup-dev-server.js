@@ -46,15 +46,15 @@ module.exports = (server, callback) => {
   const clientCompiler = webpack(clientConfig)
   const clientDevMiddleware = devMiddleware(clientCompiler, {
     publicPath: clientConfig.output.publicPath,
-    writeToDisk: true
+    // writeToDisk: true
   })
-  clientCompiler.hooks.done.tap('server', () => {
+  clientCompiler.hooks.done.tap('client', () => {
     clientManifest = JSON.parse(clientDevMiddleware.context.outputFileSystem.readFileSync(resolve('../dist/vue-ssr-client-manifest.json'), 'utf-8'))
     update()
   })
 
   // clientDevMiddleware 挂载到 Express 服务中，提供对其内部内存中数据的访问
-  // server.use(clientDevMiddleware)
+  server.use(clientDevMiddleware)
 
   server.use(hotMiddleware(clientCompiler, {
     log: false // 关闭它本身的日志输出

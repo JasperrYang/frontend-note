@@ -1,5 +1,8 @@
 <template>
   <div id="app">
+    <h1>{{ message }}</h1>
+    <div><input type="" v-model="message"></div>
+    <button @click="onClick">onClick</button>
     <ul>
       <li>
         <router-link to="/">Home</router-link>
