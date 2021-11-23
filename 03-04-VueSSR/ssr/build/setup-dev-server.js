@@ -46,7 +46,6 @@ module.exports = (server, callback) => {
   const clientCompiler = webpack(clientConfig)
   const clientDevMiddleware = devMiddleware(clientCompiler, {
     publicPath: clientConfig.output.publicPath,
-    // writeToDisk: true
   })
   clientCompiler.hooks.done.tap('client', () => {
     clientManifest = JSON.parse(clientDevMiddleware.context.outputFileSystem.readFileSync(resolve('../dist/vue-ssr-client-manifest.json'), 'utf-8'))
