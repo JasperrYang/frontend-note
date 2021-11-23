@@ -7,7 +7,6 @@ const hotMiddleware = require('webpack-hot-middleware')
 const serverConfig = require('./webpack.server.config')
 const clientConfig = require('./webpack.client.config')
 
-
 const resolve = file => path.resolve(__dirname, file)
 const templatePath = path.resolve(__dirname, '../index.template.html')
 

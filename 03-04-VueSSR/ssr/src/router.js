@@ -23,11 +23,11 @@ export const createRouter = () => {
         name: 'post-list',
         component: () => import('@/pages/Posts')
       },
-      // {
-      //   path: '*',
-      //   name: 'error404',
-      //   component: () => import('@/pages/404')
-      // }
+      {
+        path: '*',
+        name: 'error',
+        component: () => import('@/pages/404')
+      }
     ]
   })
 
