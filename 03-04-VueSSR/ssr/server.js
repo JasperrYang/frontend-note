@@ -23,10 +23,8 @@ const render = async (req, res) => {
       await onReady
     }
     const html = await renderer.renderToString({
-      title: 'vue ssr',
-      metas: `
-          <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-          <meta name="keyword" content="vue,ssr">
+      title: '',
+      meta: `
           <meta name="description" content="vue srr demo">
       `,
       url: req.url,
