@@ -136,4 +136,62 @@ export default {
     - Patch flag
     - 缓存事件处理函数
 
+## Proxy 和 Reflect 中的 receiver 指向问题？
+
+Proxy 中的 receiver 指向 proxy 实例
+
+```js
+const proxy = new Proxy({}, {
+  get: function(target, key, receiver) {
+    return receiver;
+  }
+});
+proxy.getReceiver === proxy // true
+```
+
+Reflect 中的 receiver
+
+- 如果属性部署了读取函数（getter），则读取函数的 this 绑定 receiver。
+
+```js
+var myObject = {
+  foo: 1,
+  bar: 2,
+  get baz() {
+    return this.foo + this.bar;
+  },
+};
+
+var myReceiverObject = {
+  foo: 4,
+  bar: 4,
+};
+
+Reflect.get(myObject, 'baz', myReceiverObject) // 8
+```
+
+- Reflect.set 一旦传 receiver，就会将属性赋值到 receiver 上面（即obj），导致触发 defineProperty 拦截
+
+```js
+      let p = {
+        a: "a",
+      };
+
+      let handler = {
+        set(target, key, value, receiver) {
+          console.log("set");
+          Reflect.set(target, key, value, receiver);
+        },
+        defineProperty(target, key, attribute) {
+          console.log("defineProperty");
+          Reflect.defineProperty(target, key, attribute);
+        },
+      };
+
+      let obj = new Proxy(p, handler);
+      obj.a = "A";
+      // set
+      // defineProperty
+```
+
 ## Vue.js 3.0 响应式系统的实现原理？
