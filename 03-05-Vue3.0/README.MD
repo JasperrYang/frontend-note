@@ -195,3 +195,56 @@ Reflect.get(myObject, 'baz', myReceiverObject) // 8
 ```
 
 ## Vue.js 3.0 响应式系统的实现原理？
+
+Vue 3.0 的响应式系统是独立的模块，可以完全脱离 Vue 而使用，而贯穿整个响应式系统得无非是 reactive、effect 方法
+
+- reactive：通过 Proxy 设置 get、set、deleteProperty 代理，返回对象的响应式副本。
+    - get：收集依赖，递归将代理对象转成响应式对象
+    - set：更新值并触发更新
+    - deleteProperty：删除并触发更新
+
+- effect：立即执行传入的一个函数，同时响应式追踪其依赖，并在其依赖变更时重新运行该函数
+
+### 依赖收集-track
+
+当 effect 被立即执行时，触发代理对象的 getter 方法，get 方法内部会调用 track 方法将属性与对应的 effect 函数建立依赖关系
+
+![](/img/docs-reactive.png)
+
+```js
+let activeEffect = null
+function effect(callback) {
+  activeEffect = callback
+  callback()
+  activeEffect = null
+}
+
+let targetMap = new WeakMap()
+function track(target, key) {
+  if(!activeEffect) return
+  let depsMap = targetMap.get(target)
+  if (!depsMap) targetMap.set(target, (depsMap = new Map()))
+  let dep = depsMap.get(key)
+  if (!dep) depsMap.set(key, (dep = new Set()))
+  dep.add(activeEffect)
+}
+```
+
+### 触发更新-trigger
+
+更新/删除属性时触发代理对象的 setter 方法，set 内部调用 trigger 方法进行更新操作。
+
+trigger 会去依赖记录中查找对应字段依赖的 effect 并依次执行
+
+```js
+function trigger(target, key) {
+  let depsMap = targetMap.get(target)
+  if (!depsMap) return
+  const dep = depsMap.get(key)
+  if (dep) {
+    dep.forEach(effect => {
+      effect()
+    })
+  }
+}
+```

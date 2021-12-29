@@ -9,11 +9,71 @@
   <body></body>
 </html>
 <script>
+  // const product = reactive({
+  //   name: "iPhone",
+  //   price: 5000,
+  //   count: 3,
+  // });
+
+  // effect(() => console.log(product.price * product.count));
+
+  // product.count = 5;
+
+  // product.price = 2000;
+
+  // const price = ref(5000);
+  // const count = ref(3);
+
+  // let total = 0;
+  // effect(() => {
+  //   total = price.value * count.value;
+  // });
+  // console.log(total);
+
+  // price.value = 4000;
+  // console.log(total);
+
+  // count.value = 1;
+  // console.log(total);
+
+  // function useProduct() {
+  //   const product = reactive({
+  //     name: "iPhone",
+  //     price: 5000,
+  //     count: 3,
+  //   });
+
+  //   return toRefs(product);
+  // }
+
+  // const { price, count } = useProduct();
+
+  // let total = 0;
+  // effect(() => {
+  //   total = price.value * count.value;
+  // });
+  // console.log(total);
+
+  // price.value = 4000;
+  // console.log(total);
+
+  // count.value = 1;
+  // console.log(total);
+
   const product = reactive({
     name: "iPhone",
     price: 5000,
     count: 3,
   });
-  product.count = 5;
-  delete product.count;
+  let total = computed(() => {
+    return product.price * product.count;
+  });
+
+  console.log(total.value);
+
+  product.price = 4000;
+  console.log(total.value);
+
+  product.count = 1;
+  console.log(total.value);
 </script>
