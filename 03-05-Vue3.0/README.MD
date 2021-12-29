@@ -209,7 +209,7 @@ Vue 3.0 的响应式系统是独立的模块，可以完全脱离 Vue 而使用�
 
 当 effect 被立即执行时，触发代理对象的 getter 方法，get 方法内部会调用 track 方法将属性与对应的 effect 函数建立依赖关系
 
-![](/img/docs-reactive.png)
+![](https://raw.githubusercontent.com/JasperrYang/frontend-note/main/03-05-Vue3.0/img/docs-reactive.png)
 
 ```js
 let activeEffect = null
